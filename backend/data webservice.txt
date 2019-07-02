@@ -1,0 +1,80 @@
+ip: http://36.66.232.220:8686/t10maiNDealer01/list22
+list : sales force - nama2 sales all (status A=Aktif X=non Aktif)
+list2 : sales program
+list3 : hdrdtlsalesprogram
+list3b :hdrdtlsalesprogram (parameter kota)
+list4 : leasing
+list5 : UMTC
+list6 : Sales kupon
+list7 : Surat jalan - parameter kd dealer
+list8 : versi aplikasi
+list9 : karyawan
+list10 : karyawan (parameter nik)
+list11 : harga motor
+list12 : provinsi
+list13 : kabupaten kota
+list14 : kecamatan
+list15 : kelurahan
+list16 : sales kupon
+list17 : sales kupon dealer kota
+list18 : leasing
+list19 : sales program
+list20 : sales program kota
+list21 : sales program leasing
+list22 : UMTC (all)
+list23 : config KPB
+list24 : asuransi
+list25 : CDB (parameter dealer, bulantahun)
+list26 : no mesin (parameter no polisi)
+list27 : data motor (parameter no mesin)
+list28 : bpkb stnk dealer
+list29 : SJP
+list30 : dealer parameter kd dealer
+list31 : laporceri dealer
+list32 : laporceri MD
+list33
+list34 : all dealer
+list35 : surat jalan parameter hari/kodedealer
+list36 : surat jalan detail param nosj - slash diganti titik
+list37 : po indent param hari/kd dealer
+list39 : master leasing
+list40 : list program gc /parameter tahun
+
+kode status dan rule di table dealer
+Status :
+
+A -> Masih dipakai
+
+B -> Dibekukan
+
+C -> Sudah diputuskan
+
+Dlr Rule :
+
+A -> H1
+
+B -> H2
+
+C- > H3
+
+D -> H1 H2
+
+E -> H1 H3
+
+F- > H2 H3
+
+G -> H1 H2 H3
+
+Harga Motor
+Area : A Kalsel, B Kalteng
+Kategori :
+C - Cub
+S - Sport
+T - Matic
+W - Win
+
+Batal SPK
+Gak pak.. setiap ada pembatalan SPK yg sdh ada titipan uangnya di kasir tetap 2 level approvalnya harus ada approval dr kantor pusat.
+Kecuali yg hnya SPK blm titip uang di kasir baru approvalnya 1 level aja -deny DS
+
+https://s.tradingview.com/dailyfx/widgetembed/?frameElementId=tradingview_71a09&symbol=FX_IDC%3AXAUUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f4f7f9&studies=%5B%5D&hideideas=1&theme=White&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AXAUUSD

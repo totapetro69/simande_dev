@@ -1,0 +1,153 @@
+_Tika Novita PM_, _[03.07.18 14:45]_
+**Summary Fase Sebelumnya**
+Progress Done               
+  1. Sales Program (ws dgn cara lama) ###          _[done]_
+    - data tidak semua masuk  bug         _[done]_   
+  2. Guestbook      Iswan  
+    - tambah load list appointment  CR       _[done]_     
+    - No KTP tidak wajib diisi, karena belum tentu konsumen mau memberi, no HP cenderungan lebih mudah di kasih  CR       _[done]_
+    - Yang wajib diisi: 
+      1. Nama     _[done]_
+      2. No HP     _[done]_ 
+      3. Alamat (prov, kab, kec, kel)    _[done]_
+      4. Source     _[done]_ 
+      5. Pekerjaan     _[done]_
+      6. Jenis Kelamin    _[done]_ 
+      7. Status Deal _[done]_
+      8. tipe motor_[done]_
+      9. cara bayar  CR      _[done]_
+    - Pada menu Edit Guest Book, ada tombol Create SPK, tapi status nya harus Deal dulu, Setelah tekan Create SPK, buka form SPK dengan data2 user sudah terisi   CR    _[done]_  
+  3.  SPK      Iswan  
+    - salesprogram tidak tersimpan saat tambah dan edit  bug    _[done]_ 
+    - Discount -> pakai format number (ada digit grouping)  CR  _[done]_   
+    - Edit SPK -> nilai discount yg sebelumnya diisi, tidak tampil  bug   _[done]_  
+    - Input data guest book, nama sales yang dipilih salesman, tapi saat di SPK load data guest book -> nama salesman betul, tapi penjualan melalui nya masih sales counter  bug _[done]_     
+    - Untuk penjualan kredit, pilih Credit & Cash Tempo -> khusus cash tempo melihat dari sales program  CR      _[done]_ - wait contoh]
+    - Pada ganti leasing, data uang muka, jk waktu, angsuran, biaya admin -> tampilkan data sebelumnya, tetapi bisa dirubah  CR    _[done]_ 
+    - pada menu ganti leasing, tombol simpan tidak bisa di-klik  bug _[done]_
+    - Sosmed wajib terisi minimal 1, hobby wajib terisi  CR   _[done]_ 
+    - Pada data kuisioner jenis cust dan jenis penjualan otomatis diambil dari data SPK dan disable  CR    _[done]_
+    - button Simpan approval leasing setelah unapprove yang pertama tidak berfungsi  bug _[done]_    
+    - kuisioner jenis customer disamakan pas isi guestbook  bug   _[done]_ 
+    - Bundling, tambahan sparepart dijadikan dgn faktur, ambil HET  bug   _[done]_
+    - Sales program dan kupon nilai disimpan, tidak hanya kode nya karena  CR   -_[done]_
+    - Tipe yang sudah dibuat SO nya masih tampil di SPK dengan qty nya  bug  _[done]_
+    
+    - jangan tampil kode yang sudah ada di spk  _obey_
+
+  9. List Stok Unit      Iswan    - Jika unit di mutasi harusnya lokasi gudang berubah sesuai mutasi  bug  _[done]_    
+  10. Bundling      Iswan   - Harga perlu disimpan juga  CR  _ disimpan saat transaksi SPK_    _[done]_
+  11. Report sales      Iswan  
+    - tampilkan yg sudah terjual saja, sdh SO sudah bayar  bug _[done]_
+    - pengeluaran manual approval DS  CR _ Pengeluaran > 250rb _  _[done]_    
+    - Pengembalian Biaya STNK BPKB: sesuai rule yg terbaru  CR      
+    - Total harga pada Penerimaan Barang tidak dikalikan dengan jumlah barang  bug   _[done]_
+    
+  7. Kelurahan      Iswan    - Update - Ada Kegagalan Proses.  bug  _[done]_    
+  8. File PTM      Tika  
+    - Ketika hapus 1 record di tabel master_ptm kemudian coba upload PTM, data baru tidak masuk  bug  _[done]_    
+    - Transaksi gantung tidak usah dimasukkan ke LKH  bug      _[done]_
+  12. Upload file (json): gagal untuk semua upload      Iswan  
+    - .PDMP, .PVTM, .PDSIM, .PTM  bug      _[done]_
+    - Transaksi gantung belum refer ke page transaksi utk cetak kwitansi  bug  _[done]_ 
+  19. Receiving Part      Iswan  
+    - Data default rak vs part belum terhubung ke penerimaan part  bug  _[done]_     
+    - harusnya bisa diterima sebagian sparepart, tambah kolom qty yang bisa diterima, qty diterima  bug   _[done]_  
+  26.  PO Part      Iswan  
+    - harga yg ditampilkan harga HET saja Untuk pembayaran, bisa dilihat dari webservice surat jalan part (terdapat nilai faktur nya)"  bug _[done]_
+
+  28. Laporan Stok Harian      Iswan    - Part Number tidak muncul  bug    _[done]_  
+  35. File SDWPP      Iswan    - total unit non kpb masih salah  bug  _[done]_
+  38. File Laporan Bulanan Bengkel (SDLBB)      Iswan   - hari kerja dihitung dari absensi mekanik  CR      _[done]_
+  40. Stock Movement Part      Iswan   - jumlah antar dealer, retur, dan penjualan nilai nya minus  bug  _[done]_    
+  41. Report Akumulasi Sales Harian      Iswan   - tambahan kolom yg membedakan dari bengkel atau SO  CR  _[done]_    
+  42. Report Stock Harian      Iswan   - export pdf  CR    _[done]_  
+  62. Master Prosentase Leasing      Iswan   - new  CR      _[Done]_
+  64. Master Biaya STNK BPKB      Iswan  
+    - tipe motor diambilkan dari master tipe motor. Blm semua tipe motor ada di list dropdown. _[done]_
+    - add/edit perlu approval DS _[done]_
+    - add bisa tanpa approval DS jika load dari tahun dan kabupaten yg sama (selain 3 field teratas) _[done]_
+    - untuk edit tetap ada popup, mau update ke semua data, jika iya, update ke semua data dgn kab tahun yg sama. 
+      Jika tidak, cukup record itu yg diupdate  CR     _[done]_  
+
+      - Pengembalian biaya STNK dapat dilakukan walaupun belum penerimaan dan penyerahan  CR  _[done]_  
+      - Untuk no rekening nanti diambil dari Master Bank Dealer  CR _[done]_   
+   6.1 - indent tdk perlu nunggu approve leasing, __[done]__  
+   6.2 - ketika leasing blm approve apakah sdh bisa bayar, stlh bayar apakah bisa ganti leasing  CR _ __[done]__
+   6.3 - Mapping akun dengan transaksi, sediakan menu  CR  __[done]__menu setup jurnal otomatis
+   6.4 -- KU tdk masuk ke khas  bug  __[done]__ 
+   6.5 - tambahkan button add as piutang __[done]__ not yet script
+   13.  LKH      Iswan  - Total Cek dan KU belum tampil  bug     __[done]__ 
+   32.  Mutasi Stok Unit  bisa lbh dari 1 unit  bug  __[done]__   
+   71. Pembatalan Jurnal --delete jurnal non closing     Iswan  _[done]_
+   23. SO Part      Iswan  __[done]__
+      - SO No Part -> Materai 6000 sudah penerimaan di kasir, tapi saat SO tidak ada stok  bug   __[done]__   
+      - tidak bisa tambah sparepart  bug     __[done]__
+   44  Monitoring ETD / ETA ke Konsumen      Iswan    - ambil data di PDETD  bug    __[done]__
+
+   72  Mutasi Unit: Approval DS      Iswan  -__[done]__   - new  CR 
+      - Penjualan antar dealer di fase 4  bug  __[done]__    
+      - jenis penjualan direct (1 dokumen) __[done]__, antar dealer ( 2 dokumen)  bug  
+      - Normal, jika dia isi diskon, jika diskon + subsidi dealer (sales program) lbh dr max SD, butuh approval DS  CR  __[done]__    
+      - off the road, diskon maks biaya stnk, jk lebih pakai approval  CR      __[done]__
+      - Off the road, tidak bisa sales program  CR __[done]__     
+      - KDS (kredit dana sendiri), wajib approval DS  CR __[done]__  
+      - (KDS) jumlah angsuran didisable, rumusnya harga motor-uang muka x bunga/brpa kali  CR __[done]__ 
+      - Nomor kwitansi saat cetak sudah diganti, tapi pada saat cetakannya tidak terganti  bug      __[done]__ 
+      - Ketika cancel transaksi pembayaran Service, No reff hilang dan status menjadi "dibayar"  bug      __[done]__
+-------------------------------------------------------------------------
+3.1. Pembatalan SPK  
+  - Batal SPK (dibuat kan menu pembatalan penjualan dengan mencari no SPK, nanti ditampilkan status SPK nya)  CR   __[done]__   
+  - SPK yang status nya Sudah Dibayar keatas -> masih bisa dibatalkan  CR __[done]__
+  - SPK Sudah Surat jalan -> approval DS  CR     __[Done]__ 
+  - Status lainnya cukup approval KSP/Ka.Ops  CR __[Done]__     
+  - Saat dibatalkan, semua transaksi yang berkaitan dengan SPK tersebut otomatis batal 
+    (Pembayaran, Sales Order, Surat Jalan, Pinjaman STNK/BPKB)  CR
+  
+   
+
+6.  Kasir      Iswan  
+  
+  - bs nitip uang muka berkali2  bug      
+
+  - saat batal spk, pelu isi siapa yg approve, kpn. lgsg masuk seleksi, dan kasir bs lgsg akses dan print kwitansi  CR 
+  
+ 
+    
+  
+  
+  - Tambah pengembalian pembatalan SPK  CR 
+     
+  - (Pembayaran Service) Untuk ASS 1 sd 4 Konsumen tidak bayar, kecuali ada tambahan part & oli diluar ASS  CR      
+  
+  - jika dia ASS1-4, ga masuk kasir, nota jika tambah oli dgn kode mesin yang dapat oli apa  CR      
+  - pengeluaran insentif  CR      
+  
+
+
+Tika Novita PM, [03.07.18 14:45]
+#FASE 2          
+
+18  Seleksi Transaksi      Iswan      
+  - muncul list dari hasil pembatalan spk, maupun pinjaman stnk bpkb (kasir tinggal klik dan print nota)  CR      
+      
+
+  - kode ahm trio motor perintis juga dipakai di kode BIG (BigBike) untuk kode BIG dikecualikan dari query nya saja.  CR      
+ 
+24  Stock part      Mesmer  
+  - dirincikan part itu ada dmn sj jmlhnya brpa  CR      
+ 
+ Mutasi
+  - keluar surat jalan  CR      
+     
+  
+       
+
+
+
+ 
+69  Stock Opname Kasir      Iswan  
+  - new  CR      
+
+  - new  CR      
+     

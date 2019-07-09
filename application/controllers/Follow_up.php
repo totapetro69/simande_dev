@@ -361,6 +361,106 @@ class Follow_up extends CI_Controller {
 
     }
 
+    public function get_rangka_bykpbreminder()
+    {
+
+        $sj = array();
+
+        $offset = ($this->input->get('p')-1)*$this->input->get('per_page');
+        $kd_dealer = $this->input->get('kd_dealer') ? $this->input->get('kd_dealer') : $this->session->userdata("kd_dealer");
+
+
+        $param = array(
+            'kd_dealer' => $kd_dealer,
+            'no_rangka' => $this->input->get('no_rangka'),
+            'custom' => "JENIS_KPB NOT IN ('NONKPB') AND STATUS_DEALER NOT IN('DEALER SENDIRI')",
+            'field' => '*, STATUS_DEALER AS SERVICE_DI'
+        );
+
+
+        if($this->input->get('q')){
+            $param['keyword']   = $this->input->get('q');
+            // $param['custom']   = "(PART_NUMBER LIKE '%".$this->input->get('q')."%' OR PART_DESKRIPSI LIKE '%".$this->input->get('q')."%')";
+        }else{
+            $param['offset']    = $offset; 
+            $param['limit']     = $this->input->get('per_page');
+        }
+
+        $sj = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor_reminder", $param));
+
+        $data=array();
+        if($sj){
+            if($sj->totaldata >0) {
+                $data = array(
+                    'p' => $this->input->get('q'), 
+                    'count' => $sj->totaldata, 
+                    'per_page' => $this->input->get('per_page'), 
+                    'data' => $sj->message
+                );
+            }else{
+                $data=array(
+                    'p' => $this->input->get('p'), 
+                    'count' => $sj->totaldata, 
+                    'per_page' => $this->input->get('per_page'), 
+                    'data' => array()
+                );
+            }
+        }else{
+            $data=array(
+                'p' => $this->input->get('p'), 
+                'count' => 0,//$sj->totaldata, 
+                'per_page' => $this->input->get('per_page'), 
+                'data' => array()
+            );
+        }
+
+        // $this->output->set_output(json_encode($sj));
+        $this->output->set_output(json_encode($data));
+        // return $data_fu;
+
+
+    }
+
+    public function get_detail_fureminder()
+    {
+        $kd_dealer = $this->input->get('kd_dealer') ? $this->input->get('kd_dealer') : $this->session->userdata("kd_dealer");
+
+        $param = array(
+            'jointable' => array(
+                array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_SJKELUAR.KD_CUSTOMER", "LEFT"),
+                array("MASTER_AGAMA MA", "MA.KD_AGAMA=U.KD_AGAMA", "LEFT"),
+                array("TRANS_SJKELUAR_DETAIL SJD", "SJD.ID_SURATJALAN=TRANS_SJKELUAR.ID AND SJD.KET_UNIT NOT IN('KSU','HADIAH','BARANG')", "LEFT"),
+                array("TRANS_STNK_BUKTI STB" , "STB.NO_RANGKA=SJD.NO_RANGKA AND STB.KETERANGAN = 'PLAT' AND STB.ROW_STATUS>=0", "LEFT"),
+                array("TRANS_SPK SP" , "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT"),
+                array("TRANS_PKB PK" , "PK.NO_MESIN=SJD.NO_MESIN AND PK.ROW_STATUS>=0", "LEFT")
+            ),
+            'field' => 'SJD.NO_RANGKA, STB.DATA_NOMOR, SJD.NO_MESIN, SJD.KET_UNIT, U.*, MA.NAMA_AGAMA, TRANS_SJKELUAR.NO_SURATJALAN, TRANS_SJKELUAR.TGL_TERIMA, TRANS_SJKELUAR.STATUS_SJ,SP.TGL_SO, convert(char,SP.TGL_SO,112) AS TGL_PEMBELIAN, PK.TANGGAL_PKB, convert(varchar(10), PK.TANGGAL_PKB, 103)',
+            'orderby' => 'TRANS_SJKELUAR.TGL_TERIMA asc'
+        );
+
+        $param['custom'] = "SJD.NO_RANGKA = '".$this->input->get('no_rangka')."' AND TRANS_SJKELUAR.KD_DEALER ='".$kd_dealer."'";
+
+        $data_fu['sj'] = json_decode($this->curl->simple_get(API_URL . "/api/inventori/sjkeluar", $param));
+
+        if(!empty($data_fu['sj']) && (is_array($data_fu['sj']->message) || is_object($data_fu['sj']->message))):
+
+
+            $param = array(
+                'no_rangka' => $data_fu['sj']->message[0]->NO_RANGKA
+            );
+
+            $kpb = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor_reminder", $param));
+            
+            $data_fu['kpb'] = $kpb->message;
+
+
+
+        endif;
+
+        $this->output->set_output(json_encode($data_fu));
+
+    }
+
     public function followup_service_reminder_booking_simpan()
     {
         $ntrans = ($this->input->post('no_trans') ? $this->input->post('no_trans') : $this->autogenerate_fu('FUS'));

@@ -464,7 +464,7 @@ function addData() {
 
     var formData = $("#addForm").serialize();
     var act = $("#addForm").attr('action');
-
+    
     $.ajax({
         url: act,
         type: 'POST',

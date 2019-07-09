@@ -1,12 +1,14 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Service_reminder extends CI_Controller {
+class Service_reminder extends CI_Controller
+{
 
     var $API;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         //API_URL=str_replace('frontend/','backend/',base_url())."index.php";
         $this->load->library('form_validation');
@@ -17,8 +19,9 @@ class Service_reminder extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper("zetro_helper");
     }
-    
-    public function pagination($config) {
+
+    public function pagination($config)
+    {
 
         $config['page_query_string'] = TRUE;
         $config['query_string_segment'] = 'page';
@@ -40,125 +43,176 @@ class Service_reminder extends CI_Controller {
         return $config;
     }
 
-    public function index() {
-
+    public function service_reminder()
+    {
         $data = array();
-
-        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_CUST_REMINDER.KD_DEALER = '".$this->input->get('kd_dealer')."'" : "TRANS_CUST_REMINDER.KD_DEALER ='".$this->session->userdata("kd_dealer")."'";
-
         $param = array(
+            'keyword' => $this->input->get('keyword'),
+            'row_status' => ($this->input->get('row_status') == null) ? 0 : $this->input->get('row_status'),
             'offset' => ($this->input->get('page') == null) ? 0 : $this->input->get('page', TRUE),
             'limit' => 15,
-            'keyword' => $this->input->get('keyword'),
-            'jointable' => array(
-                array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_CUST_REMINDER.KD_CUSTOMER", "LEFT")
-            ),
-            'custom' => $kd_dealer,
-            'field' => "U.*, TRANS_CUST_REMINDER.*"
+            'field' => 'TRANS_SERVICE_REMINDER.*',
+            'orderby' => 'TRANS_SERVICE_REMINDER.ID DESC'
         );
 
-        $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service/cust_reminder", $param));
-               
+        $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service_reminder/service_reminder", $param));
+
+        //var_dump($data["list"]);
+
         $string = link_pagination();
         $config = array(
             'per_page' => $param['limit'],
             'base_url' => $string[0],
             'total_rows' => ($data["list"]) ? $data["list"]->totaldata : 0
         );
-
-        $pagination = $this->template->pagination($config);
+        $pagination = $this->pagination($config);
 
         $this->pagination->initialize($pagination);
         $data['pagination'] = $this->pagination->create_links();
 
 
-        // $this->output->set_output(json_encode($data["list"]));
         $this->template->site('service_reminder/index', $data);
     }
 
+    public function add_service_reminder()
+    {
+        $this->auth->validate_authen('service_reminder/service_reminder');
 
-    public function add_service_reminder(){
-
-        $data = array();
-        $this->auth->validate_authen('reminder_booking/service_reminder');
-
-
-        if($this->input->get('no_trans')){
-            $param = array(
-                'no_trans' => $this->input->get('no_trans')
-            );
-
-            $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service/cust_reminder", $param));
-        }
-
-
-        $this->load->view('service_reminder/add_service_reminder', $data);
+        $this->load->view('service_reminder/add_service_reminder');
         $html = $this->output->get_output();
-        
+
         $this->output->set_output(json_encode($html));
     }
 
-
-    public function service_reminder_simpan()
+    public function add_service_reminder_simpan()
     {
-        $ntrans = ($this->input->post('no_trans') ? $this->input->post('no_trans') : $this->autogenerate_fu('RS'));
+        $this->form_validation->set_rules('nama_customer', 'nama_customer', 'required|trim');
+        $this->form_validation->set_rules('kd_typemotor', 'kd_typemotor', 'required|trim');
+        $this->form_validation->set_rules('no_polisi', 'no_polisi', 'required|trim');
 
-        $param = array(
-            'id' => $this->input->post("id"),
-            'tgl_trans' => $this->input->post("tgl_trans"),
-            'kd_maindealer' => $this->session->userdata('kd_maindealer'),
-            'kd_dealer' => $this->session->userdata('kd_dealer'),
-            'no_trans' => $ntrans,
-            'kd_customer' => $this->input->post("kd_customer"),
-            'nama_customer' => $this->input->post("nama_customer"),
-            'waktu_jdwreminder' => $this->input->post("waktu_jdwreminder"),
-            'waktu_reminderkpb' => $this->input->post("waktu_reminderkpb"),
-            'jenis_kpb' => $this->input->post("jenis_kpb"),
-            'jenis_reminder' => $this->input->post("jenis_reminder"),
-            'status_reminder' => $this->input->post("status_reminder"),
-            'no_hp' => $this->input->post("no_hp"),
-            'kd_typemotor' =>$this->input->post("kd_typemotor"),
-            'no_polisi' =>$this->input->post("no_polisi"),
-            'created_by' => $this->session->userdata('user_id'),
-            'lastmodified_by' => $this->session->userdata('user_id')
-        );
+        if ($this->form_validation->run() === FALSE) {
+            $data = array(
+                'status' => false,
+                'message' => validation_errors()
+            );
 
-        // var_dump($param);exit;
-        $hasil =  $this->curl->simple_post(API_URL . "/api/service/cust_reminder", $param, array(CURLOPT_BUFFERSIZE => 100));
-        //data
+            $this->output->set_output(json_encode($data));
+        } else {
 
-        $method = "post";
+            $param = array(
+                'kd_dealer' => $this->input->post("kd_dealer"),
+                'kd_customer' => $this->input->post("kd_customer"),
+                'nama_customer' => $this->input->post("nama_customer"),
+                'kd_typemotor' => $this->input->post("kd_typemotor"),
+                'no_mesin' => $this->input->post("no_mesin"),
+                'no_polisi' => $this->input->post("no_polisi"),
+                'no_hp' => $this->input->post("no_hp"),
+                'tgl_lastservice' => $this->input->post("tgl_lastservice"),
+                'type_lastservice' => $this->input->post("type_lastservice"),
+                'tgl_nextservice' => $this->input->post("tgl_nextservice"),
+                'type_nextservice' => $this->input->post("type_nextservice"),
+                'row_status' => 0,
+                'created_by' => $this->session->userdata('user_id')
+            );
+                
+            $hasil = $this->curl->simple_post(API_URL . "/api/service_reminder/service_reminder", $param, array(CURLOPT_BUFFERSIZE => 10));
 
-        if(json_decode($hasil)->recordexists==TRUE){
+            $data = json_decode($hasil);
+            $this->session->set_flashdata('tr-active', $data->message);
 
-            $hasil= $this->curl->simple_put(API_URL."/api/service/cust_reminder",$param, array(CURLOPT_BUFFERSIZE => 10));  
-
-        // var_dump($hasil);exit;
-            $method = "put";
+            $this->data_output($hasil, 'post', base_url('service_reminder/service_reminder'));
         }
+    }
 
+    public function edit_service_reminder($id, $row_status)
+    {
+        $this->auth->validate_authen('service_reminder/service_reminder');
+        $param = array(
+            "custom" => "TRANS_SERVICE_REMINDER.ID='" . $id . "'",
+            'row_status' => $row_status
+        );
+        $data = array();
+        $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service_reminder/service_reminder", $param));
+        $this->load->view('service_reminder/edit_service_reminder', $data);
+        $html = $this->output->get_output();
 
-        $this->data_output($hasil, $method); 
-        //test
+        $this->output->set_output(json_encode($html));
+    }
 
+    public function update_service_reminder($id)
+    {
+        $this->form_validation->set_rules('nama_customer', 'nama_customer', 'required|trim');
+        $this->form_validation->set_rules('kd_typemotor', 'kd_typemotor', 'required|trim');
+        $this->form_validation->set_rules('no_polisi', 'no_polisi', 'required|trim');
 
+        if ($this->form_validation->run() === FALSE) {
+            $data = array(
+                'status' => false,
+                'message' => validation_errors()
+            );
+
+            $this->output->set_output(json_encode($data));
+        } else {
+
+            $param = array(
+                'id' => $this->input->post("id"),
+                'kd_dealer' => $this->input->post("kd_dealer"),
+                'kd_customer' => $this->input->post("kd_customer"),
+                'nama_customer' => $this->input->post("nama_customer"),
+                'kd_typemotor' => $this->input->post("kd_typemotor"),
+                'no_mesin' => $this->input->post("no_mesin"),
+                'no_polisi' => $this->input->post("no_polisi"),
+                'no_hp' => $this->input->post("no_hp"),
+                'tgl_lastservice' => $this->input->post("tgl_lastservice"),
+                'type_lastservice' => $this->input->post("type_lastservice"),
+                'tgl_nextservice' => $this->input->post("tgl_nextservice"),
+                'type_nextservice' => $this->input->post("type_nextservice"),
+                'status_sms' => $this->input->post("status_sms"),
+                'status_call' => $this->input->post("status_call"),
+                'booking_status' => $this->input->post("booking_status"),
+                'alasan' => $this->input->post("alasan"),
+                'reschedule' => $this->input->post("reschedule"),
+                'lastmodified_by' => $this->session->userdata('user_id')
+            );
+            
+            $hasil = $this->curl->simple_put(API_URL . "/api/service_reminder/service_reminder", $param, array(CURLOPT_BUFFERSIZE => 10));
+
+            $this->session->set_flashdata('tr-active', $id);
+
+            $this->data_output($hasil, 'put');
+        }
     }
 
     public function service_reminder_hapus($id)
     {
+        $data = array();
         $param = array(
             'id' => $id,
-            'lastmodified_by'=> $this->session->userdata('user_id')
+            'lastmodified_by' => $this->session->userdata('user_id')
         );
+        $data["list"] = json_decode($this->curl->simple_delete(API_URL . "/api/service_reminder/service_reminder", $param));
 
-        $data = array();
-        $data["list"]=json_decode($this->curl->simple_delete(API_URL."/api/service/cust_reminder",$param));
+        if ($data) {
+            $data_status = array(
+                'status' => true,
+                'message' => 'Data berhasil dihapus',
+                'location' => base_url('service_reminder/service_reminder')
+            );
 
-        $this->data_output($data, 'delete', base_url('reminder_booking/service_reminder'));
+            $this->output->set_output(json_encode($data_status));
+        } else {
+            $data_status = array(
+                'status' => false,
+                'message' => 'Data gagal dihapus',
+            );
+
+            $this->output->set_output(json_encode($data_status));
+        }
 
     }
-    
-    public function setupreminder() {
+
+    public function setupreminder()
+    {
         $data = array();
         $param = array(
             'keyword' => $this->input->get('keyword'),
@@ -170,9 +224,9 @@ class Service_reminder extends CI_Controller {
         );
 
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service_reminder/setupreminder", $param));
-        
+
         //var_dump($data["list"]);
-               
+
         $string = link_pagination();
         $config = array(
             'per_page' => $param['limit'],
@@ -188,16 +242,18 @@ class Service_reminder extends CI_Controller {
         $this->template->site('service_reminder/setup_reminder/view', $data);
     }
 
-    public function add_setupreminder() {
+    public function add_setupreminder()
+    {
         $this->auth->validate_authen('service_reminder/setupreminder');
-        
+
         $this->load->view('service_reminder/setup_reminder/add');
         $html = $this->output->get_output();
 
         $this->output->set_output(json_encode($html));
     }
 
-    public function add_setupreminder_simpan() {
+    public function add_setupreminder_simpan()
+    {
         $this->form_validation->set_rules('type_srv_next', 'Type KPB', 'required|trim');
         $this->form_validation->set_rules('tgl_srv_reminder', 'Hari -x reminder', 'required|trim');
         $this->form_validation->set_rules('tgl_srv_next', 'Hari Jatuh tempo Service', 'required|trim');
@@ -209,7 +265,7 @@ class Service_reminder extends CI_Controller {
             );
 
             $this->output->set_output(json_encode($data));
-        } else {          
+        } else {
 
             $param = array(
                 'type_srv_next' => $this->input->post("type_srv_next"),
@@ -228,10 +284,11 @@ class Service_reminder extends CI_Controller {
         }
     }
 
-    public function edit_setupreminder($id, $row_status) {
+    public function edit_setupreminder($id, $row_status)
+    {
         $this->auth->validate_authen('service_reminder/setupreminder');
         $param = array(
-            "custom" => "SETUP_SERVICE_REMINDER.ID='".$id."'",
+            "custom" => "SETUP_SERVICE_REMINDER.ID='" . $id . "'",
             'row_status' => $row_status
         );
 
@@ -245,7 +302,8 @@ class Service_reminder extends CI_Controller {
         $this->output->set_output(json_encode($html));
     }
 
-    public function update_setupreminder($id) {
+    public function update_setupreminder($id)
+    {
         $this->form_validation->set_rules('type_srv_next', 'Type KPB', 'required|trim');
         $this->form_validation->set_rules('tgl_srv_reminder', 'Hari -x reminder', 'required|trim');
         $this->form_validation->set_rules('tgl_srv_next', 'Hari Jatuh tempo Service', 'required|trim');
@@ -258,7 +316,7 @@ class Service_reminder extends CI_Controller {
 
             $this->output->set_output(json_encode($data));
         } else {
-            
+
             $param = array(
                 'id' => $this->input->post("id"),
                 'type_srv_next' => $this->input->post("type_srv_next"),
@@ -267,7 +325,7 @@ class Service_reminder extends CI_Controller {
                 'row_status' => $this->input->post("row_status"),
                 'created_by' => $this->session->userdata('user_id')
             );
-            
+
             $hasil = $this->curl->simple_put(API_URL . "/api/service_reminder/setupreminder", $param, array(CURLOPT_BUFFERSIZE => 10));
 
             $this->session->set_flashdata('tr-active', $id);
@@ -276,8 +334,10 @@ class Service_reminder extends CI_Controller {
         }
     }
 
-    public function delete_setupreminder($id) {
-        $data = array();        $param = array(
+    public function delete_setupreminder($id)
+    {
+        $data = array();
+        $param = array(
             'id' => $id,
             'lastmodified_by' => $this->session->userdata('user_id')
         );
@@ -290,7 +350,7 @@ class Service_reminder extends CI_Controller {
                 'message' => 'Data berhasil dihapus',
                 'location' => base_url('service_reminder/setupreminder')
             );
-                                                                                                                                                                                                                                       
+
             $this->output->set_output(json_encode($data_status));
         } else {
             $data_status = array(
@@ -302,7 +362,8 @@ class Service_reminder extends CI_Controller {
         }
     }
 
-    public function setupreminder_typeahead() {
+    public function setupreminder_typeahead()
+    {
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "api/service_reminder/setupreminder"));
 
         foreach ($data["list"]->message as $key => $message) {
@@ -314,7 +375,8 @@ class Service_reminder extends CI_Controller {
         $this->output->set_output(json_encode($result));
     }
 
-    function data_output($hasil = NULL, $method = '') {
+    function data_output($hasil = NULL, $method = '')
+    {
         $result = "";
         switch ($method) {
             case 'post':
@@ -348,5 +410,4 @@ class Service_reminder extends CI_Controller {
                 break;
         }
     }
-    
 }

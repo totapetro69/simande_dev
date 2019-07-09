@@ -1148,7 +1148,45 @@ class Master_service extends REST_Controller {
         $this->Main_model->set_offset($this->get("offset"));
         $this->Main_model->set_recordlimit($this->get("limit"));
         $this->Main_model->set_jointable($this->get("jointable"));
-        $this->resultdata("TRANS_KPB_MOTOR_VIEW",$param);
+        $this->resultdata("TRANS_KPB_MOTOR_VIEW",$param);    
+    }
+
+    public function kpb_motor_reminder_get(){
+        $param = array();$search='';
+        if($this->get("no_rangka")){
+            $param["NO_RANGKA"]     = $this->get("no_rangka");
+        }
+        if($this->get("jenis_kpb")){
+            $param["JENIS_KPB"]     = $this->get("jenis_kpb");
+        }
+        if($this->get("keyword")){
+            $param=array();
+            $search= array(
+                "NO_RANGKA" => $this->get("keyword"),
+                "JENIS_KPB" => $this->get("keyword"),
+                "BULAN_SERVICE" => $this->get("keyword"),
+                "STATUS_SERVICE" => $this->get("keyword"),
+                "STATUS_DEALER" => $this->get("keyword"),
+                "NAMA_CUSTOMER" =>$this->get("keyword"),
+                "BULAN_SERVICE" =>$this->get("keyword"),
+                );
+        }
+        if($this->get("kd_dealer")){
+            $param["KD_DEALER"] = $this->get("kd_dealer");
+        }
+        $this->Main_model->set_search_criteria($search);
+        $this->Main_model->set_statusdata($this->get('row_status'));
+        $custom="";
+        if($this->get("custom")){
+            $this->Main_model->set_customcriteria($this->get("custom"));
+        }
+        $this->Main_model->set_orderby($this->get("orderby"));
+        $this->Main_model->set_groupby($this->get("groupby"));
+        $this->Main_model->set_selectfield($this->get('field'));
+        $this->Main_model->set_offset($this->get("offset"));
+        $this->Main_model->set_recordlimit($this->get("limit"));
+        $this->Main_model->set_jointable($this->get("jointable"));
+        $this->resultdata("TRANS_DATA_REMINDER_VIEW",$param);
     }
 
     /**

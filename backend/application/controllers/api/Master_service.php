@@ -568,7 +568,7 @@ class Master_service extends REST_Controller {
         fwrite($handle,$param);
         fclose($handle);
         $datax=$this->Custom_model->querysdmj();
-        unlink($folder);
+        // unlink($folder);
         if($datax){
             $result["status"]   = FALSE;
             $result["message"]  = "Data gagal di simpan";

@@ -84,6 +84,15 @@ class Service_reminder extends CI_Controller
         $this->output->set_output(json_encode($html));
     }
 
+    public function mesin_kpb()
+    {
+            $param_no['no_mesin'] = $this->input->get('id');
+            
+            $n = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb", $param_no));
+            $this->output->set_output(json_encode($n));
+
+    }
+
     public function add_service_reminder_simpan()
     {
         $this->form_validation->set_rules('nama_customer', 'nama_customer', 'required|trim');
@@ -114,6 +123,8 @@ class Service_reminder extends CI_Controller
                 'row_status' => 0,
                 'created_by' => $this->session->userdata('user_id')
             );
+
+
                 
             $hasil = $this->curl->simple_post(API_URL . "/api/service_reminder/service_reminder", $param, array(CURLOPT_BUFFERSIZE => 10));
 

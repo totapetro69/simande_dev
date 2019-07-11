@@ -1,5 +1,14 @@
 <?php
 
+if (!isBolehAkses()) {
+    redirect(base_url() . 'auth/error_auth');
+}
+
+$status_c = (isBolehAkses('c') ? '' : 'disabled-action');
+$status_e = (isBolehAkses('e') ? '' : 'disabled-action');
+$status_v = (isBolehAkses('v') ? '' : 'disabled-action');
+$status_p = (isBolehAkses('p') ? '' : 'disabled-action');
+
 $ID = "";
 $NO_TRANS = "";
 $TGL_REMINDER = "";
@@ -162,6 +171,115 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
 
     });
 
+    function getd(id, kpb, tgl_lastsrv) {
+        $.ajax({
+            type: 'GET',
+            url: http + "/service_reminder/mesin_kpb",
+            dataType: 'json',
+            data: {
+                'id': id
+            },
+            success: function(result) {
+                $.each(result.message, function(index, d) {
+                    if (kpb == 'KPB1') {
+                        var lastkpb = parseInt(kpb.substr(3, 1));
+                        var kpbnext = lastkpb + 1;
+
+                        var bln_kpb = d.BSE2 - d.BSE1;
+
+                        var newTgl = new Date(tgl_lastsrv);
+
+                        var yearnext = newTgl.getFullYear();
+
+                        var month = newTgl.getMonth() + 1 + bln_kpb;
+                        var monthnext = (month < 10 ? '0' + month : month);
+
+                        var date = newTgl.getDate();
+                        var datenext = (date < 10 ? '0' + date : date);
+
+                        var next_srv = datenext + '/' + monthnext + '/' + yearnext;
+
+                        $('#type_nextservice').val('KPB' + kpbnext);
+
+                        $('#tgl_nextservice').val(next_srv);
+                    }
+
+                    if (kpb == 'KPB1') {
+                        var lastkpb = parseInt(kpb.substr(3, 1));
+                        var kpbnext = lastkpb + 1;
+
+                        var bln_kpb = d.BSE2 - d.BSE1;
+
+                        var newTgl = new Date(tgl_lastsrv);
+
+                        var yearnext = newTgl.getFullYear();
+
+                        var month = newTgl.getMonth() + 1 + bln_kpb;
+                        var monthnext = (month < 10 ? '0' + month : month);
+
+                        var date = newTgl.getDate();
+                        var datenext = (date < 10 ? '0' + date : date);
+
+                        var next_srv = datenext + '/' + monthnext + '/' + yearnext;
+
+                        $('#type_nextservice').val('KPB' + kpbnext);
+
+                        $('#tgl_nextservice').val(next_srv);
+                    }
+
+                    if (kpb == 'KPB2') {
+                        var lastkpb = parseInt(kpb.substr(3, 1));
+                        var kpbnext = lastkpb + 1;
+
+                        var bln_kpb = d.BSE3 - d.BSE2;
+
+                        var newTgl = new Date(tgl_lastsrv);
+
+                        var yearnext = newTgl.getFullYear();
+
+                        var month = newTgl.getMonth() + 1 + bln_kpb;
+                        var monthnext = (month < 10 ? '0' + month : month);
+
+                        var date = newTgl.getDate();
+                        var datenext = (date < 10 ? '0' + date : date);
+
+                        var next_srv = datenext + '/' + monthnext + '/' + yearnext;
+
+                        $('#type_nextservice').val('KPB' + kpbnext);
+
+                        $('#tgl_nextservice').val(next_srv);
+                    }
+
+                    if (kpb == 'KPB3') {
+                        var lastkpb = parseInt(kpb.substr(3, 1));
+                        var kpbnext = lastkpb + 1;
+
+                        var bln_kpb = d.BSE4 - d.BSE3;
+
+                        var newTgl = new Date(tgl_lastsrv);
+
+                        var yearnext = newTgl.getFullYear();
+
+                        var month = newTgl.getMonth() + 1 + bln_kpb;
+                        var monthnext = (month < 10 ? '0' + month : month);
+
+                        var date = newTgl.getDate();
+                        var datenext = (date < 10 ? '0' + date : date);
+
+                        var next_srv = datenext + '/' + monthnext + '/' + yearnext;
+
+                        $('#type_nextservice').val('KPB' + kpbnext);
+
+                        $('#tgl_nextservice').val(next_srv);
+                    }
+                  
+
+                })
+            }
+
+        })
+    }
+
     function getData() {
 
         var url_fu_service = http + "/follow_up/get_rangka_bykpbreminder";
@@ -216,15 +334,12 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                     $('#type_lastservice').val(kpb);
                     $('#tgl_lastservice').val(last_srv);
                     $('#no_mesin').val(result.sj.message[0].NO_MESIN);
-                    // $('#kelurahan').val(result.sj.message[0].NAMA_DESA);
-                    // $('#kecamatan').val(result.sj.message[0].NAMA_KECAMATAN);
-                    // $('#kota').val(result.sj.message[0].NAMA_KABUPATEN);
-                    // $('#kode_pos').val(result.sj.message[0].KODE_POS);
-                    // $('#propinsi').val(result.sj.message[0].NAMA_PROPINSI);
-                    // $('#tgl_pembelian').val(newDate);
-                    // $('#nama_stnk').val(result.sj.message[0].NAMA_CUSTOMER);
-                    // $('#alamat_surat').val(result.sj.message[0].ALAMAT_SURAT);
                     $('#jenis_kpb_title').html(result.kpb[0].JENIS_KPB);
+
+
+                    var no_msn_subs = result.sj.message[0].NO_MESIN.substr(0, 5);
+
+                    getd(no_msn_subs, kpb, result.sj.message[0].TANGGAL_PKB);
 
                 });
 

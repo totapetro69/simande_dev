@@ -1,12 +1,14 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Follow_up extends CI_Controller {
+class Follow_up extends CI_Controller
+{
 
     var $API;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         //API_URL=str_replace('frontend/','backend/',base_url())."index.php";
         $this->load->library('form_validation');
@@ -23,28 +25,29 @@ class Follow_up extends CI_Controller {
      * [customer description]
      * @return [type] [description]
      */
-    public function call_pembeliaan() {
-//        var_dump($this->session->userdata());exit;
+    public function call_pembeliaan()
+    {
+        //        var_dump($this->session->userdata());exit;
         $data = array();
-         $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_SJKELUAR.KD_DEALER = '".$this->input->get('kd_dealer')."'" : "TRANS_SJKELUAR.KD_DEALER ='".$this->session->userdata("kd_dealer")."'";
+        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_SJKELUAR.KD_DEALER = '" . $this->input->get('kd_dealer') . "'" : "TRANS_SJKELUAR.KD_DEALER ='" . $this->session->userdata("kd_dealer") . "'";
 
         $param = array(
             'offset' => ($this->input->get('page') == null) ? 0 : $this->input->get('page', TRUE),
             'limit' => 15,
             'keyword' => $this->input->get('keyword'),
-            'custom' => "TRANS_SJKELUAR.STATUS_SJ = 'aproved' AND SJD.NO_RANGKA NOT IN (SELECT P.NO_FRAME FROM TRANS_FU_THANKS AS P WHERE P.ROW_STATUS >=0 AND P.NO_FRAME IS NOT NULL) AND ".$kd_dealer,
+            'custom' => "TRANS_SJKELUAR.STATUS_SJ = 'aproved' AND SJD.NO_RANGKA NOT IN (SELECT P.NO_FRAME FROM TRANS_FU_THANKS AS P WHERE P.ROW_STATUS >=0 AND P.NO_FRAME IS NOT NULL) AND " . $kd_dealer,
             'jointable' => array(
                 array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_SJKELUAR.KD_CUSTOMER", "LEFT"),
                 array("TRANS_SJKELUAR_DETAIL SJD", "SJD.ID_SURATJALAN=TRANS_SJKELUAR.ID AND SJD.KET_UNIT NOT IN('KSU','HADIAH','BARANG')", "LEFT"),
-                array("TRANS_SPK SP" , "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
+                array("TRANS_SPK SP", "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
             ),
             'field' => 'SJD.NO_RANGKA, U.*, TRANS_SJKELUAR.KD_CUSTOMER, TRANS_SJKELUAR.NAMA_PENERIMA, TRANS_SJKELUAR.NO_SURATJALAN, TRANS_SJKELUAR.TGL_TERIMA, TRANS_SJKELUAR.STATUS_SJ,SP.TGL_SO, convert(char,SP.TGL_SO,112) AS TGL_PEMBELIAN',
             'orderby' => 'TRANS_SJKELUAR.TGL_TERIMA asc'
         );
 
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/inventori/sjkeluar", $param));
-        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer",listDealer()));
-               
+        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer", listDealer()));
+
         $string = link_pagination();
         $config = array(
             'per_page' => $param['limit'],
@@ -58,48 +61,48 @@ class Follow_up extends CI_Controller {
         $this->template->site('followup/call_pembeliaan', $data);
     }
 
-    public function call_thanks(){
+    public function call_thanks()
+    {
 
         $data = array();
-        
+
         $this->auth->validate_authen('follow_up/call_pembeliaan');
-        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_SJKELUAR.KD_DEALER = '".$this->input->get('kd_dealer')."'" : "TRANS_SJKELUAR.KD_DEALER ='".$this->session->userdata("kd_dealer")."'";
+        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_SJKELUAR.KD_DEALER = '" . $this->input->get('kd_dealer') . "'" : "TRANS_SJKELUAR.KD_DEALER ='" . $this->session->userdata("kd_dealer") . "'";
 
         $param = array(
-            'custom' => "SJD.NO_RANGKA = '".$this->input->get('no_rangka')."' AND ".$kd_dealer,
+            'custom' => "SJD.NO_RANGKA = '" . $this->input->get('no_rangka') . "' AND " . $kd_dealer,
             'jointable' => array(
                 array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_SJKELUAR.
                     KD_CUSTOMER", "LEFT"),
                 array("MASTER_AGAMA MA", "MA.KD_AGAMA=U.KD_AGAMA", "LEFT"),
                 array("TRANS_SJKELUAR_DETAIL SJD", "SJD.ID_SURATJALAN=TRANS_SJKELUAR.ID AND SJD.KET_UNIT NOT IN('KSU','HADIAH','BARANG')", "LEFT"),
-                array("TRANS_SPK SP" , "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
+                array("TRANS_SPK SP", "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
             ),
             'field' => 'SJD.NO_RANGKA, SJD.NO_MESIN, U.*, MA.NAMA_AGAMA, TRANS_SJKELUAR.NO_SURATJALAN, TRANS_SJKELUAR.TGL_TERIMA, TRANS_SJKELUAR.STATUS_SJ,SP.TGL_SO, convert(char,SP.TGL_SO,112) AS TGL_PEMBELIAN',
             'orderby' => 'TRANS_SJKELUAR.TGL_TERIMA asc'
         );
 
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/inventori/sjkeluar", $param));
-        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer",listDealer()));
+        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer", listDealer()));
 
         $this->load->view('followup/call_thanks', $data);
         $html = $this->output->get_output();
-        
+
         $this->output->set_output(json_encode($html));
     }
 
-    public function metode_fu($filter_metode=null)
+    public function metode_fu($filter_metode = null)
     {
         $param = array(
             'id' => $this->input->get('id')
         );
 
-        if($filter_metode == null)
-        {
+        if ($filter_metode == null) {
             $param['custom'] = "(NAMA_METODE = 'SMS' OR NAMA_METODE = 'CALL')";
         }
 
         $data = json_decode($this->curl->simple_get(API_URL . "/api/master_hc3/metodefu", $param));
-        
+
         $this->output->set_output(json_encode($data->message));
     }
 
@@ -112,9 +115,8 @@ class Follow_up extends CI_Controller {
         );
 
         $data = json_decode($this->curl->simple_get(API_URL . "/api/marketing/callvisit", $param));
-        
-        $this->output->set_output(json_encode($data->message));
 
+        $this->output->set_output(json_encode($data->message));
     }
 
     public function followup_pembelian_simpan()
@@ -152,18 +154,16 @@ class Follow_up extends CI_Controller {
 
         $hasil =  $this->curl->simple_post(API_URL . "/api/master_hc3/fu_thanks", $param, array(CURLOPT_BUFFERSIZE => 100));
         $method = "post";
-        if(json_decode($hasil)->recordexists==TRUE){
-            $hasil= $this->curl->simple_put(API_URL."/api/master_hc3/fu_thanks",$param, array(CURLOPT_BUFFERSIZE => 10));  
+        if (json_decode($hasil)->recordexists == TRUE) {
+            $hasil = $this->curl->simple_put(API_URL . "/api/master_hc3/fu_thanks", $param, array(CURLOPT_BUFFERSIZE => 10));
             $method = "put";
         }
-        if($hasil)
-        {
-            if(json_decode($hasil)->message>0){
+        if ($hasil) {
+            if (json_decode($hasil)->message > 0) {
                 $post_detail = $this->fu_thanksdetail($ntrans);
             }
-            
         }
-        $this->data_output($hasil, $method); 
+        $this->data_output($hasil, $method);
     }
 
     public function fu_thanksdetail($ntrans)
@@ -190,11 +190,12 @@ class Follow_up extends CI_Controller {
     }
 
 
-    public function service_reminder_booking() {
+    public function service_reminder_booking()
+    {
 
         $data = array();
 
-        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_FU_SERVICE.KD_DEALER = '".$this->input->get('kd_dealer')."'" : "TRANS_FU_SERVICE.KD_DEALER ='".$this->session->userdata("kd_dealer")."'";
+        $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_FU_SERVICE.KD_DEALER = '" . $this->input->get('kd_dealer') . "'" : "TRANS_FU_SERVICE.KD_DEALER ='" . $this->session->userdata("kd_dealer") . "'";
 
         $param = array(
             'offset' => ($this->input->get('page') == null) ? 0 : $this->input->get('page', TRUE),
@@ -211,8 +212,8 @@ class Follow_up extends CI_Controller {
         );
 
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/master_hc3/fu_service", $param));
-        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer",listDealer()));
-                       
+        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer", listDealer()));
+
         $string = link_pagination();
         $config = array(
             'per_page' => $param['limit'],
@@ -227,19 +228,19 @@ class Follow_up extends CI_Controller {
     }
 
 
-    public function call_service_reminder_booking(){
+    public function call_service_reminder_booking()
+    {
 
         $data = array();
         $this->auth->validate_authen('follow_up/service_reminder_booking');
-        if($this->input->get('no_trans'))
-        {
-            $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_FU_SERVICE.KD_DEALER = '".$this->input->get('kd_dealer')."'" : "TRANS_FU_SERVICE.KD_DEALER ='".$this->session->userdata("kd_dealer")."'";
+        if ($this->input->get('no_trans')) {
+            $kd_dealer = $this->input->get('kd_dealer') ? "TRANS_FU_SERVICE.KD_DEALER = '" . $this->input->get('kd_dealer') . "'" : "TRANS_FU_SERVICE.KD_DEALER ='" . $this->session->userdata("kd_dealer") . "'";
 
             $param = array(
                 'custom' => $kd_dealer,
                 'no_trans' => $this->input->get('no_trans'),
                 'jointable' => array(
-                    array("TRANS_FU_SERVICE_DETAIL FSD" , "FSD.NO_TRANS=TRANS_FU_SERVICE.NO_TRANS AND FSD.ROW_STATUS>=0", "LEFT")
+                    array("TRANS_FU_SERVICE_DETAIL FSD", "FSD.NO_TRANS=TRANS_FU_SERVICE.NO_TRANS AND FSD.ROW_STATUS>=0", "LEFT")
                 ),
                 'field' => 'FSD.*, TRANS_FU_SERVICE.*'
             );
@@ -248,17 +249,17 @@ class Follow_up extends CI_Controller {
         }
 
         $param_hasilfu = array(
-            'kategori' => 'Hasil FU H2' 
+            'kategori' => 'Hasil FU H2'
         );
 
 
         $data["hasil_fu"] = json_decode($this->curl->simple_get(API_URL . "/api/setup/hasil_fu", $param_hasilfu));
-        
+
         // $this->output->set_output(json_encode($data));
 
         $this->load->view('followup/call_service_reminder_booking', $data);
         $html = $this->output->get_output();
-        
+
         $this->output->set_output(json_encode($html));
     }
 
@@ -267,7 +268,7 @@ class Follow_up extends CI_Controller {
 
         $sj = array();
 
-        $offset = ($this->input->get('p')-1)*$this->input->get('per_page');
+        $offset = ($this->input->get('p') - 1) * $this->input->get('per_page');
         $kd_dealer = $this->input->get('kd_dealer') ? $this->input->get('kd_dealer') : $this->session->userdata("kd_dealer");
 
 
@@ -279,38 +280,38 @@ class Follow_up extends CI_Controller {
         );
 
 
-        if($this->input->get('q')){
+        if ($this->input->get('q')) {
             $param['keyword']   = $this->input->get('q');
             // $param['custom']   = "(PART_NUMBER LIKE '%".$this->input->get('q')."%' OR PART_DESKRIPSI LIKE '%".$this->input->get('q')."%')";
-        }else{
-            $param['offset']    = $offset; 
+        } else {
+            $param['offset']    = $offset;
             $param['limit']     = $this->input->get('per_page');
         }
 
         $sj = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor", $param));
 
-        $data=array();
-        if($sj){
-            if($sj->totaldata >0) {
+        $data = array();
+        if ($sj) {
+            if ($sj->totaldata > 0) {
                 $data = array(
-                    'p' => $this->input->get('q'), 
-                    'count' => $sj->totaldata, 
-                    'per_page' => $this->input->get('per_page'), 
+                    'p' => $this->input->get('q'),
+                    'count' => $sj->totaldata,
+                    'per_page' => $this->input->get('per_page'),
                     'data' => $sj->message
                 );
-            }else{
-                $data=array(
-                    'p' => $this->input->get('p'), 
-                    'count' => $sj->totaldata, 
-                    'per_page' => $this->input->get('per_page'), 
+            } else {
+                $data = array(
+                    'p' => $this->input->get('p'),
+                    'count' => $sj->totaldata,
+                    'per_page' => $this->input->get('per_page'),
                     'data' => array()
                 );
             }
-        }else{
-            $data=array(
-                'p' => $this->input->get('p'), 
-                'count' => 0,//$sj->totaldata, 
-                'per_page' => $this->input->get('per_page'), 
+        } else {
+            $data = array(
+                'p' => $this->input->get('p'),
+                'count' => 0, //$sj->totaldata, 
+                'per_page' => $this->input->get('per_page'),
                 'data' => array()
             );
         }
@@ -331,18 +332,18 @@ class Follow_up extends CI_Controller {
                 array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_SJKELUAR.KD_CUSTOMER", "LEFT"),
                 array("MASTER_AGAMA MA", "MA.KD_AGAMA=U.KD_AGAMA", "LEFT"),
                 array("TRANS_SJKELUAR_DETAIL SJD", "SJD.ID_SURATJALAN=TRANS_SJKELUAR.ID AND SJD.KET_UNIT NOT IN('KSU','HADIAH','BARANG')", "LEFT"),
-                array("TRANS_STNK_BUKTI STB" , "STB.NO_RANGKA=SJD.NO_RANGKA AND STB.KETERANGAN = 'PLAT' AND STB.ROW_STATUS>=0", "LEFT"),
-                array("TRANS_SPK SP" , "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
+                array("TRANS_STNK_BUKTI STB", "STB.NO_RANGKA=SJD.NO_RANGKA AND STB.KETERANGAN = 'PLAT' AND STB.ROW_STATUS>=0", "LEFT"),
+                array("TRANS_SPK SP", "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT")
             ),
             'field' => 'SJD.NO_RANGKA, STB.DATA_NOMOR, SJD.NO_MESIN, SJD.KET_UNIT, U.*, MA.NAMA_AGAMA, TRANS_SJKELUAR.NO_SURATJALAN, TRANS_SJKELUAR.TGL_TERIMA, TRANS_SJKELUAR.STATUS_SJ,SP.TGL_SO, convert(char,SP.TGL_SO,112) AS TGL_PEMBELIAN',
             'orderby' => 'TRANS_SJKELUAR.TGL_TERIMA asc'
         );
 
-        $param['custom'] = "SJD.NO_RANGKA = '".$this->input->get('no_rangka')."' AND TRANS_SJKELUAR.KD_DEALER ='".$kd_dealer."'";
+        $param['custom'] = "SJD.NO_RANGKA = '" . $this->input->get('no_rangka') . "' AND TRANS_SJKELUAR.KD_DEALER ='" . $kd_dealer . "'";
 
         $data_fu['sj'] = json_decode($this->curl->simple_get(API_URL . "/api/inventori/sjkeluar", $param));
 
-        if(!empty($data_fu['sj']) && (is_array($data_fu['sj']->message) || is_object($data_fu['sj']->message))):
+        if (!empty($data_fu['sj']) && (is_array($data_fu['sj']->message) || is_object($data_fu['sj']->message))) :
 
 
             $param = array(
@@ -350,7 +351,7 @@ class Follow_up extends CI_Controller {
             );
 
             $kpb = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor", $param));
-            
+
             $data_fu['kpb'] = $kpb->message;
 
 
@@ -358,7 +359,6 @@ class Follow_up extends CI_Controller {
         endif;
 
         $this->output->set_output(json_encode($data_fu));
-
     }
 
     public function get_rangka_bykpbreminder()
@@ -366,7 +366,7 @@ class Follow_up extends CI_Controller {
 
         $sj = array();
 
-        $offset = ($this->input->get('p')-1)*$this->input->get('per_page');
+        $offset = ($this->input->get('p') - 1) * $this->input->get('per_page');
         $kd_dealer = $this->input->get('kd_dealer') ? $this->input->get('kd_dealer') : $this->session->userdata("kd_dealer");
 
 
@@ -378,38 +378,38 @@ class Follow_up extends CI_Controller {
         );
 
 
-        if($this->input->get('q')){
+        if ($this->input->get('q')) {
             $param['keyword']   = $this->input->get('q');
             // $param['custom']   = "(PART_NUMBER LIKE '%".$this->input->get('q')."%' OR PART_DESKRIPSI LIKE '%".$this->input->get('q')."%')";
-        }else{
-            $param['offset']    = $offset; 
+        } else {
+            $param['offset']    = $offset;
             $param['limit']     = $this->input->get('per_page');
         }
 
         $sj = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor_reminder", $param));
 
-        $data=array();
-        if($sj){
-            if($sj->totaldata >0) {
+        $data = array();
+        if ($sj) {
+            if ($sj->totaldata > 0) {
                 $data = array(
-                    'p' => $this->input->get('q'), 
-                    'count' => $sj->totaldata, 
-                    'per_page' => $this->input->get('per_page'), 
+                    'p' => $this->input->get('q'),
+                    'count' => $sj->totaldata,
+                    'per_page' => $this->input->get('per_page'),
                     'data' => $sj->message
                 );
-            }else{
-                $data=array(
-                    'p' => $this->input->get('p'), 
-                    'count' => $sj->totaldata, 
-                    'per_page' => $this->input->get('per_page'), 
+            } else {
+                $data = array(
+                    'p' => $this->input->get('p'),
+                    'count' => $sj->totaldata,
+                    'per_page' => $this->input->get('per_page'),
                     'data' => array()
                 );
             }
-        }else{
-            $data=array(
-                'p' => $this->input->get('p'), 
-                'count' => 0,//$sj->totaldata, 
-                'per_page' => $this->input->get('per_page'), 
+        } else {
+            $data = array(
+                'p' => $this->input->get('p'),
+                'count' => 0, //$sj->totaldata, 
+                'per_page' => $this->input->get('per_page'),
                 'data' => array()
             );
         }
@@ -430,19 +430,19 @@ class Follow_up extends CI_Controller {
                 array("MASTER_CUSTOMER_VIEW U", "U.KD_CUSTOMER=TRANS_SJKELUAR.KD_CUSTOMER", "LEFT"),
                 array("MASTER_AGAMA MA", "MA.KD_AGAMA=U.KD_AGAMA", "LEFT"),
                 array("TRANS_SJKELUAR_DETAIL SJD", "SJD.ID_SURATJALAN=TRANS_SJKELUAR.ID AND SJD.KET_UNIT NOT IN('KSU','HADIAH','BARANG')", "LEFT"),
-                array("TRANS_STNK_BUKTI STB" , "STB.NO_RANGKA=SJD.NO_RANGKA AND STB.KETERANGAN = 'PLAT' AND STB.ROW_STATUS>=0", "LEFT"),
-                array("TRANS_SPK SP" , "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT"),
-                array("TRANS_PKB PK" , "PK.NO_MESIN=SJD.NO_MESIN AND PK.ROW_STATUS>=0", "LEFT")
+                array("TRANS_STNK_BUKTI STB", "STB.NO_RANGKA=SJD.NO_RANGKA AND STB.KETERANGAN = 'PLAT' AND STB.ROW_STATUS>=0", "LEFT"),
+                array("TRANS_SPK SP", "SP.NO_SO=TRANS_SJKELUAR.NO_REFF AND SP.ROW_STATUS>=0", "LEFT"),
+                array("TRANS_PKB PK", "PK.NO_MESIN=SJD.NO_MESIN AND PK.ROW_STATUS>=0", "LEFT")
             ),
             'field' => 'SJD.NO_RANGKA, STB.DATA_NOMOR, SJD.NO_MESIN, SJD.KET_UNIT, U.*, MA.NAMA_AGAMA, TRANS_SJKELUAR.NO_SURATJALAN, TRANS_SJKELUAR.TGL_TERIMA, TRANS_SJKELUAR.STATUS_SJ,SP.TGL_SO, convert(char,SP.TGL_SO,112) AS TGL_PEMBELIAN, PK.TANGGAL_PKB, convert(varchar(10), PK.TANGGAL_PKB, 103)',
             'orderby' => 'TRANS_SJKELUAR.TGL_TERIMA asc'
         );
 
-        $param['custom'] = "SJD.NO_RANGKA = '".$this->input->get('no_rangka')."' AND TRANS_SJKELUAR.KD_DEALER ='".$kd_dealer."'";
+        $param['custom'] = "SJD.NO_RANGKA = '" . $this->input->get('no_rangka') . "' AND TRANS_SJKELUAR.KD_DEALER ='" . $kd_dealer . "'";
 
         $data_fu['sj'] = json_decode($this->curl->simple_get(API_URL . "/api/inventori/sjkeluar", $param));
 
-        if(!empty($data_fu['sj']) && (is_array($data_fu['sj']->message) || is_object($data_fu['sj']->message))):
+        if (!empty($data_fu['sj']) && (is_array($data_fu['sj']->message) || is_object($data_fu['sj']->message))) :
 
 
             $param = array(
@@ -450,15 +450,12 @@ class Follow_up extends CI_Controller {
             );
 
             $kpb = json_decode($this->curl->simple_get(API_URL . "/api/master_service/kpb_motor_reminder", $param));
-            
+
             $data_fu['kpb'] = $kpb->message;
-
-
 
         endif;
 
         $this->output->set_output(json_encode($data_fu));
-
     }
 
     public function followup_service_reminder_booking_simpan()
@@ -497,32 +494,28 @@ class Follow_up extends CI_Controller {
         $method = "post";
 
         // var_dump($hasil);exit;
-        if(json_decode($hasil)->recordexists==TRUE){
+        if (json_decode($hasil)->recordexists == TRUE) {
 
-            $hasil= $this->curl->simple_put(API_URL."/api/master_hc3/fu_service",$param, array(CURLOPT_BUFFERSIZE => 10));  
+            $hasil = $this->curl->simple_put(API_URL . "/api/master_hc3/fu_service", $param, array(CURLOPT_BUFFERSIZE => 10));
 
-        // var_dump($hasil);exit;
+            // var_dump($hasil);exit;
             $method = "put";
         }
 
 
-        if($hasil)
-        {
-            if(json_decode($hasil)->message>0){
+        if ($hasil) {
+            if (json_decode($hasil)->message > 0) {
 
                 $post_detail = $this->fu_service_reminder_booking_detail($ntrans);
-
             }
-            
         }
 
 
-        $this->data_output($hasil, $method); 
+        $this->data_output($hasil, $method);
         //test
 
 
     }
-
 
 
     public function fu_service_reminder_booking_detail($ntrans)
@@ -548,7 +541,7 @@ class Follow_up extends CI_Controller {
         $hasil =  $this->curl->simple_post(API_URL . "/api/master_hc3/fu_service_detail", $param, array(CURLOPT_BUFFERSIZE => 100));
 
 
-        if(json_decode($hasil)->recordexists==TRUE){
+        if (json_decode($hasil)->recordexists == TRUE) {
 
             $param['kd_metodefu2'] = $this->input->post("kd_metodefu2");
             $param['kd_status_metodefu2'] = $this->input->post("kd_status_metodefu2");
@@ -558,11 +551,8 @@ class Follow_up extends CI_Controller {
             $param['hasil_metodefu2'] = $this->input->post("hasil_metodefu2");
             $param['lastmodified_by'] = $this->session->userdata('user_id');
 
-            $hasil= $this->curl->simple_put(API_URL."/api/master_hc3/fu_service_detail",$param, array(CURLOPT_BUFFERSIZE => 10));  
-
+            $hasil = $this->curl->simple_put(API_URL . "/api/master_hc3/fu_service_detail", $param, array(CURLOPT_BUFFERSIZE => 10));
         }
-
-
     }
 
     public function after_service()
@@ -588,7 +578,7 @@ class Follow_up extends CI_Controller {
             'custom' => 'SELISIH_TGL = 6'
         );
         $data["pop_up"] = json_decode($this->curl->simple_get(API_URL . "/api/master_hc3/fu_call_view", $param_popup));
-                       
+
         $string = link_pagination();
         $config = array(
             'per_page' => $param['limit'],
@@ -599,20 +589,20 @@ class Follow_up extends CI_Controller {
 
         $this->pagination->initialize($pagination);
         $data['pagination'] = $this->pagination->create_links();
-        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer",listDealer()));
+        $data["dealer"] = json_decode($this->curl->simple_get(API_URL . "/api/master/dealer", listDealer()));
         $this->template->site('followup/call_afterservice', $data);
-        
     }
 
 
-    public function after_service_notif(){
+    public function after_service_notif()
+    {
 
         $data = array();
         $this->auth->validate_authen('follow_up/after_service');
 
         $param = array(
-            'jointable' =>array(
-                array("MASTER_PART MP" , "MP.PART_NUMBER=TRANS_PKB_DETAIL.KD_PEKERJAAN AND MP.ROW_STATUS>=0", "LEFT")
+            'jointable' => array(
+                array("MASTER_PART MP", "MP.PART_NUMBER=TRANS_PKB_DETAIL.KD_PEKERJAAN AND MP.ROW_STATUS>=0", "LEFT")
 
             ),
             "no_pkb" => $this->input->get('no_pkb'),
@@ -622,26 +612,27 @@ class Follow_up extends CI_Controller {
         $data["list"] = json_decode($this->curl->simple_get(API_URL . "/api/service/pkb_detail", $param));
 
         // $this->output->set_output(json_encode($data));
-        
+
         $this->load->view('followup/call_afterservice_notif', $data);
         $html = $this->output->get_output();
-        
+
         $this->output->set_output(json_encode($html));
     }
 
 
-    function autogenerate_fu($kd_docno) {
+    function autogenerate_fu($kd_docno)
+    {
         $no_trans = "";
         $nomortrans = 0;
         $param = array(
             'kd_docno' => $kd_docno,
             'kd_dealer' => $this->session->userdata("kd_dealer"),
-            'tahun_docno' => date('Y'),// substr($this->input->post('tgl_trans'), 6, 4),
+            'tahun_docno' => date('Y'), // substr($this->input->post('tgl_trans'), 6, 4),
             'limit' => 1,
             'offset' => 0
         );
         //print_r($param);
-        $bulan_kirim = date('m');// substr($this->input->post('tgl_trans'), 3, 2);
+        $bulan_kirim = date('m'); // substr($this->input->post('tgl_trans'), 3, 2);
         $nomortrans = $this->curl->simple_get(API_URL . "/api/setup/docno", $param);
         $kd_dealer = str_pad($this->session->userdata("kd_dealer"), 3, 0, STR_PAD_LEFT);
         if ($nomortrans == 0) {
@@ -663,7 +654,8 @@ class Follow_up extends CI_Controller {
      * @param  [type] $hasil [description]
      * @return [type]        [description]
      */
-    function data_output($hasil = NULL, $method = '', $location = '') {
+    function data_output($hasil = NULL, $method = '', $location = '')
+    {
         $result = "";
         switch ($method) {
             case 'post':
@@ -717,5 +709,4 @@ class Follow_up extends CI_Controller {
                 break;
         }
     }
-
 }

@@ -1,12 +1,14 @@
 <?php
+
 if (!isBolehAkses()) {
-  redirect(base_url() . 'auth/error_auth');
+    redirect(base_url() . 'auth/error_auth');
 }
 
 $status_c = (isBolehAkses('c') ? '' : 'disabled-action');
 $status_e = (isBolehAkses('e') ? '' : 'disabled-action');
 $status_v = (isBolehAkses('v') ? '' : 'disabled-action');
 $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
+
 ?>
 
 <div class="modal-header">
@@ -18,6 +20,11 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
 
   <form id="addForm" class="bucket-form" method="post" action="<?php echo base_url('service_reminder/update_service_reminder/' . $list->message[0]->ID); ?>">
     <input type="hidden" name="id" id="id" class="form-control" value="<?php echo  $list->message[0]->ID; ?>">
+
+    <div class="form-group">
+      <label>Tgl Reminder</label>
+      <input id="tgl_reminder" type="text" name="tgl_reminder" class="form-control" value="<?php echo tglfromSql($list->message[0]->TGL_REMINDER); ?>" >
+    </div>    
 
     <div class="form-group">
       <label>Kode Dealer</label>
@@ -41,7 +48,7 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
 
     <div class="form-group">
       <label>No Polisi</label>
-      <input id="no_polisi" type="text" name="no_polisi" class="form-control" value="<?php echo $list->message[0]->NO_POLISI; ?>" readonly>
+      <input id="no_polisi" type="text" name="no_polisi" class="form-control" value="<?php echo $list->message[0]->NO_POLISI; ?>">
     </div>
 
     <div class="form-group">
@@ -57,14 +64,14 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
     <div class="form-group">
       <label>Tgl Service Terakhir</label>
       <div class="input-group input-append date" id="datepicker">
-        <input id="tgl_lastservice" type="text" name="tgl_lastservice" class="form-control" required value="<?php echo  tglfromSql($list->message[0]->TGL_LASTSERVICE); ?>">
+        <input id="tgl_lastservice" type="text" name="tgl_lastservice" class="form-control" required value="<?php echo  tglfromSql($list->message[0]->TGL_LASTSERVICE); ?>" readonly>
         <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
       </div>
     </div>
 
     <div class="form-group">
       <label>Type Service Sebelumnya</label>
-      <select name="type_lastservice" class="form-control">
+      <select name="type_lastservice" class="form-control" readonly>
         <option value="<?php echo $list->message[0]->TYPE_LASTSERVICE; ?>"> <?php echo $list->message[0]->TYPE_LASTSERVICE; ?> </option>
         <option value="KPB1">KPB1</option>
         <option value="KPB2">KPB2</option>
@@ -150,3 +157,15 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
   <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
   <button id="submit-btn" onclick="addData();" class="btn btn-danger">Simpan</button>
 </div>
+
+<script type="text/javascript">
+
+    $(function() {
+        $('#tgl_lastservice').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+        $('#tgl_nextservice').datepicker();
+        $('#tgl_reminder').datepicker();
+    });
+
+</script>

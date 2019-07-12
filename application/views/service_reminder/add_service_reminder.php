@@ -145,6 +145,14 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                 <option value="KPB4" <?php echo ($TYPE_NEXTSERVICE == 'KPB4' ? "selected" : ""); ?>>KPB4</option>
             </select>
         </div>
+
+        <div class="form-group">
+            <label>Tgl Reminder</label>
+            <div class="input-group">
+                <input id="tgl_reminder" type="text" name="tgl_reminder" class="form-control">
+                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+        </div>
     </form>
 
 </div>
@@ -163,6 +171,7 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
             format: 'dd/mm/yyyy'
         });
         $('#tgl_nextservice').datepicker();
+        $('#tgl_reminder').datepicker();
     });
 
     $(document).ready(function() {
@@ -194,37 +203,21 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                         var month = newTgl.getMonth() + 1 + bln_kpb;
                         var monthnext = (month < 10 ? '0' + month : month);
 
+                        var monthrem = newTgl.getMonth() + 1 + bln_kpb - 1;
+                        var monthreminder = (monthrem < 10 ? '0' + monthrem : monthrem);
+
                         var date = newTgl.getDate();
                         var datenext = (date < 10 ? '0' + date : date);
+
+                        var datereminder = datenext + '/' + monthreminder + '/' + yearnext;
 
                         var next_srv = datenext + '/' + monthnext + '/' + yearnext;
 
                         $('#type_nextservice').val('KPB' + kpbnext);
 
                         $('#tgl_nextservice').val(next_srv);
-                    }
 
-                    if (kpb == 'KPB1') {
-                        var lastkpb = parseInt(kpb.substr(3, 1));
-                        var kpbnext = lastkpb + 1;
-
-                        var bln_kpb = d.BSE2 - d.BSE1;
-
-                        var newTgl = new Date(tgl_lastsrv);
-
-                        var yearnext = newTgl.getFullYear();
-
-                        var month = newTgl.getMonth() + 1 + bln_kpb;
-                        var monthnext = (month < 10 ? '0' + month : month);
-
-                        var date = newTgl.getDate();
-                        var datenext = (date < 10 ? '0' + date : date);
-
-                        var next_srv = datenext + '/' + monthnext + '/' + yearnext;
-
-                        $('#type_nextservice').val('KPB' + kpbnext);
-
-                        $('#tgl_nextservice').val(next_srv);
+                        $('#tgl_reminder').val(datereminder);
                     }
 
                     if (kpb == 'KPB2') {
@@ -240,14 +233,21 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                         var month = newTgl.getMonth() + 1 + bln_kpb;
                         var monthnext = (month < 10 ? '0' + month : month);
 
+                        var monthrem = newTgl.getMonth() + 1 + bln_kpb - 1;
+                        var monthreminder = (monthrem < 10 ? '0' + monthrem : monthrem);
+
                         var date = newTgl.getDate();
                         var datenext = (date < 10 ? '0' + date : date);
+
+                        var datereminder = datenext + '/' + monthreminder + '/' + yearnext;
 
                         var next_srv = datenext + '/' + monthnext + '/' + yearnext;
 
                         $('#type_nextservice').val('KPB' + kpbnext);
 
                         $('#tgl_nextservice').val(next_srv);
+
+                        $('#tgl_reminder').val(datereminder);
                     }
 
                     if (kpb == 'KPB3') {
@@ -263,16 +263,23 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                         var month = newTgl.getMonth() + 1 + bln_kpb;
                         var monthnext = (month < 10 ? '0' + month : month);
 
+                        var monthrem = newTgl.getMonth() + 1 + bln_kpb - 1;
+                        var monthreminder = (monthrem < 10 ? '0' + monthrem : monthrem);
+
                         var date = newTgl.getDate();
                         var datenext = (date < 10 ? '0' + date : date);
+
+                        var datereminder = datenext + '/' + monthreminder + '/' + yearnext;
 
                         var next_srv = datenext + '/' + monthnext + '/' + yearnext;
 
                         $('#type_nextservice').val('KPB' + kpbnext);
 
                         $('#tgl_nextservice').val(next_srv);
+
+                        $('#tgl_reminder').val(datereminder);
                     }
-                  
+
 
                 })
             }
@@ -295,7 +302,7 @@ if (!empty($list) && (is_array($list) || is_object($list))) {
                 pageMode: '',
                 pageField: 'p',
                 pageLimitField: 'per_page',
-                limit: 30,
+                limit: 10,
                 pageCurrent: 1,
             })
             .on("change", function(e) {

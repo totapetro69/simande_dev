@@ -120,11 +120,10 @@ class Service_reminder extends CI_Controller
                 'type_lastservice' => $this->input->post("type_lastservice"),
                 'tgl_nextservice' => $this->input->post("tgl_nextservice"),
                 'type_nextservice' => $this->input->post("type_nextservice"),
+                'tgl_reminder' => $this->input->post("tgl_reminder"),
                 'row_status' => 0,
                 'created_by' => $this->session->userdata('user_id')
             );
-
-
                 
             $hasil = $this->curl->simple_post(API_URL . "/api/service_reminder/service_reminder", $param, array(CURLOPT_BUFFERSIZE => 10));
 
@@ -167,6 +166,7 @@ class Service_reminder extends CI_Controller
 
             $param = array(
                 'id' => $this->input->post("id"),
+                'tgl_reminder' => $this->input->post("tgl_reminder"),
                 'kd_dealer' => $this->input->post("kd_dealer"),
                 'kd_customer' => $this->input->post("kd_customer"),
                 'nama_customer' => $this->input->post("nama_customer"),

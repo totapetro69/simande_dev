@@ -1,7 +1,7 @@
 <?php
 
 if (!isBolehAkses()) {
-    redirect(base_url() . 'auth/error_auth');
+  redirect(base_url() . 'auth/error_auth');
 }
 
 $status_c = (isBolehAkses('c') ? '' : 'disabled-action');
@@ -23,8 +23,8 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
 
     <div class="form-group">
       <label>Tgl Reminder</label>
-      <input id="tgl_reminder" type="text" name="tgl_reminder" class="form-control" value="<?php echo tglfromSql($list->message[0]->TGL_REMINDER); ?>" >
-    </div>    
+      <input id="tgl_reminder" type="text" name="tgl_reminder" class="form-control" value="<?php echo tglfromSql($list->message[0]->TGL_REMINDER); ?>">
+    </div>
 
     <div class="form-group">
       <label>Kode Dealer</label>
@@ -55,7 +55,7 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
       <label>Tipe Unit</label>
       <input id="kd_typemotor" type="text" name="kd_typemotor" class="form-control" value="<?php echo $list->message[0]->KD_TYPEMOTOR; ?>" readonly>
     </div>
-    
+
     <div class="form-group">
       <label>No Mesin</label>
       <input id="no_mesin" type="text" name="no_mesin" class="form-control" value="<?php echo $list->message[0]->NO_MESIN; ?>" readonly>
@@ -130,13 +130,13 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
       <label>Booking Status </label>
       <select id="booking_status" name="booking_status" class="form-control">
         <option value="<?php echo $list->message[0]->BOOKING_STATUS; ?>"> <?php echo $list->message[0]->BOOKING_STATUS; ?> </option>
-        <option value="No">No</option>
         <option value="Yes">Yes</option>
+        <option value="No">No</option>
       </select>
     </div>
 
-    <div class="form-group">
-      <label>Alasan TIdak Booking</label>
+    <div class="form-group" id="form_alasan" style="display:none;">
+      <label >Alasan Tidak Booking</label>
       <input id="alasan" type="text" name="alasan" class="form-control" value="<?php echo $list->message[0]->ALASAN; ?>">
     </div>
 
@@ -159,13 +159,22 @@ $status_p = (isBolehAkses('p') ? '' : 'disabled-action');
 </div>
 
 <script type="text/javascript">
-
-    $(function() {
-        $('#tgl_lastservice').datepicker({
-            format: 'dd/mm/yyyy'
-        });
-        $('#tgl_nextservice').datepicker();
-        $('#tgl_reminder').datepicker();
+  $(function() {
+    $('#tgl_lastservice').datepicker({
+      format: 'dd/mm/yyyy'
     });
+    $('#tgl_nextservice').datepicker();
+    $('#tgl_reminder').datepicker();
+  });
 
+  $('#booking_status').on('change', function() {
+    if ($(this).val() === "No") {
+      $("#form_alasan").show()
+    }else if ($(this).val() === "") {
+      $("#form_alasan").hide()
+    }
+     else {
+      $("#form_alasan").hide()
+    }
+  });
 </script>

@@ -253,6 +253,18 @@ class Service_reminder extends CI_Controller
         $this->template->site('service_reminder/setup_reminder/view', $data);
     }
 
+    public function kirimsms()
+    {
+        $param= array(
+            'link' => 'kirimsms',
+            'nohp' => '',
+            'pesan' => 'Salam satu hati',
+            'creaby' => 'Simande'
+        );
+        $data = $this->curl->simple_get(API_URL . "/api/login/webservicesms/true", $param);
+        var_dump($data);
+    }
+
     public function add_setupreminder()
     {
         $this->auth->validate_authen('service_reminder/setupreminder');
